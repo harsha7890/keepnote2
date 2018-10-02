@@ -1,10 +1,20 @@
 package com.stackroute.keepnote.controller;
 
+import com.stackroute.keepnote.dao.NoteDAO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ViewResolver;
+import org.springframework.web.servlet.view.InternalResourceViewResolver;
+import org.springframework.web.servlet.view.JstlView;
+
 /*
  * Annotate the class with @Controller annotation.@Controller annotation is used to mark 
  * any POJO class as a controller so that Spring can recognize this class as a Controller
  */
-
+@Controller
+@RequestMapping
 public class NoteController {
 	/*
 	 * From the problem statement, we can understand that the application requires
@@ -17,19 +27,31 @@ public class NoteController {
 	 * 4. Update an existing note
 	 * 
 	 */
-
 	/*
 	 * Autowiring should be implemented for the NoteDAO.
 	 * Create a Note object.
 	 * 
 	 */
 
+    private NoteDAO noteDAO;
+    @Autowired
+    public NoteController(NoteDAO noteDAO){
+        this.noteDAO = noteDAO;
+    }
 	/*
 	 * Define a handler method to read the existing notes from the database and add
 	 * it to the ModelMap which is an implementation of Map, used when building
 	 * model data for use with views. it should map to the default URL i.e. "/index"
 	 */
-
+        @RequestMapping("/")
+        @Bean
+        public ViewResolver viewResolver() {
+            InternalResourceViewResolver viewResolver = new InternalResourceViewResolver();
+            viewResolver.setViewClass(JstlView.class);
+            viewResolver.setPrefix("/WEB-INF/views/");
+            viewResolver.setSuffix(".jsp");
+            return viewResolver;
+        }
 	/*
 	 * Define a handler method which will read the NoteTitle, NoteContent,
 	 * NoteStatus from request parameters and save the note in note table in

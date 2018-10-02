@@ -1,10 +1,15 @@
 package com.stackroute.keepnote.dao;
 
-import java.util.List;
-
-import org.hibernate.SessionFactory;
-
 import com.stackroute.keepnote.model.Note;
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Order;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
+import javax.transaction.Transactional;
+import java.util.List;
 
 /*
  * This class is implementing the NoteDAO interface. This class has to be annotated with @Repository
@@ -15,13 +20,34 @@ import com.stackroute.keepnote.model.Note;
  * 					transaction. The database transaction happens inside the scope of a persistence 
  * 					context.  
  * */
-
+@Repository("NoteDAO")
+@Transactional
 public class NoteDAOImpl implements NoteDAO {
 
 	/*
 	 * Autowiring should be implemented for the SessionFactory.
 	 */
+	@Autowired
+    private SessionFactory sessionFactory;
+    protected Session getSession(){
+        return sessionFactory.getCurrentSession();
+    }
 
+//    @SuppressWarnings("unchecked")
+
+
+//    public void persist(T entity) {
+//        getSession().persist(entity);
+//    }
+//
+//    public void delete(T entity) {
+//        getSession().delete(entity);
+//    }
+//
+//    protected Criteria createEntityCriteria(){
+//        return getSession().createCriteria(persistentClass);
+//    }
+	
 	public NoteDAOImpl(SessionFactory sessionFactory) {
 
 	}
@@ -29,18 +55,30 @@ public class NoteDAOImpl implements NoteDAO {
 	/*
 	 * Save the note in the database(note) table.
 	 */
-
+        private NoteDAO dao;
 	public boolean saveNote(Note note) {
-		return false;
-
-	}
+        try {
+            getSession().persist(note);
+            getSession().getTransaction().commit();
+            return true;
+        }
+        catch (Exception e){
+            return false;
+        }
+    }
 
 	/*
 	 * Remove the note from the database(note) table.
 	 */
 
 	public boolean deleteNote(int noteId) {
-		return false;
+		try {
+            getSession().delete(noteId);
+        return true;
+		}
+		catch (Exception e){
+		    return false;
+        }
 
 	}
 
@@ -49,15 +87,15 @@ public class NoteDAOImpl implements NoteDAO {
 	 * order(showing latest note first)
 	 */
 	public List<Note> getAllNotes() {
-		return null;
-
+//        List<Note> notes = getSession().createSQLQuery("select contents").list();
+        Criteria criteria = getSession().createCriteria(Note.class).addOrder(Order.desc());
+        return (List<Note>) criteria.list();
 	}
 
 	/*
 	 * retrieve specific note from the database(note) table
 	 */
 	public Note getNoteById(int noteId) {
-		return null;
 
 	}
 
